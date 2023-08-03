@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- displays site properly based on user's device -->
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./assets/images/favicon-32x32.png"
+    />
+
+    <title>Frontend Mentor | Age calculator app</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="inputs">
+        <div class="form-group">
+          <label for="day">DAY</label>
+          <input
+            type="number"
+            id="day"
+            placeholder="DD"
+            min="1"
+            max="31"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="month">MONTH</label>
+          <input
+            type="number"
+            id="month"
+            placeholder="MM"
+            min="1"
+            max="12"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="year">YEAR</label>
+          <input type="number" id="year" placeholder="YYYY" required />
+        </div>
+      </div>
+
+      <div class="submit">
+        <hr />
+        <button type="button" id="calculateBtn">
+          <img src="assets/images/icon-arrow.svg" alt="" />
+        </button>
+      </div>
+
+      <div class="display">
+        <h1><span id="years">--</span> years</h1>
+        <h1><span id="months">--</span> months</h1>
+        <h1><span id="days">--</span> days</h1>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const dayInput = document.getElementById("day");
+        const monthInput = document.getElementById("month");
+        const yearInput = document.getElementById("year");
+        const yearsSpan = document.getElementById("years");
+        const monthsSpan = document.getElementById("months");
+        const daysSpan = document.getElementById("days");
+        const calculateBtn = document.getElementById("calculateBtn");
+
+        calculateBtn.addEventListener("click", function () {
+          clearDisplay();
+
+          const day = parseInt(dayInput.value, 10);
+          const month = parseInt(monthInput.value, 10);
+          const year = parseInt(yearInput.value, 10);
+
+          const isValidDate = isValidDateInput(day, month, year);
+          if (!isValidDate) {
+            return;
+          }
+
+          const currentDate = new Date();
+          const dob = new Date(year, month - 1, day); // Month is zero-indexed
+          const age = calculateAge(currentDate, dob);
+
+          displayAge(age);
+        });
+
+        function isValidDateInput(day, month, year) {
+          const maxDay = new Date(year, month, 0).getDate();
+          if (
+            day < 1 ||
+            day > maxDay ||
+            isNaN(day) ||
+            isNaN(month) ||
+            isNaN(year)
+          ) {
+            alert("Please enter a valid date.");
+            return false;
+          }
+          return true;
+        }
+
+        function calculateAge(currentDate, dob) {
+          let age = {};
+          let yearDiff = currentDate.getFullYear() - dob.getFullYear();
+          let monthDiff = currentDate.getMonth() - dob.getMonth();
+          let dayDiff = currentDate.getDate() - dob.getDate();
+
+          if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+            yearDiff--;
+            monthDiff += 12;
+          }
+
+          if (dayDiff < 0) {
+            const daysInLastMonth = new Date(
+              currentDate.getFullYear(),
+              currentDate.getMonth(),
+              0
+            ).getDate();
+            dayDiff = currentDate.getDate() + (daysInLastMonth - dob.getDate());
+            monthDiff--;
+
+            if (monthDiff < 0) {
+              monthDiff += 12;
+              yearDiff--;
+            }
+          }
+
+          age.years = yearDiff;
+          age.months = monthDiff;
+          age.days = dayDiff;
+
+          return age;
+        }
+
+        function displayAge(age) {
+          yearsSpan.textContent = age.years;
+          monthsSpan.textContent = age.months;
+          daysSpan.textContent = age.days;
+        }
+
+        function clearDisplay() {
+          yearsSpan.textContent = "--";
+          monthsSpan.textContent = "--";
+          daysSpan.textContent = "--";
+        }
+      });
+    </script>
+  </body>
+</html>
